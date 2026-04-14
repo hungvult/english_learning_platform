@@ -1,0 +1,9 @@
+[submodule "server"]
+	path = server
+	url = https://github.com/hungvult/english_learning_platform-server
+[submodule "client"]
+	path = client
+	url = https://github.com/hungvult/english_learning_platform-client
+[submodule "seed_data"]
+	path = seed_data
+	url = https://github.com/hungvult/english_learning_platform-seed_data
