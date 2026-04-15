@@ -4,8 +4,8 @@
 
 ## Tech Stack
 
-- **Frontend:** Next.js 14+ (App Router), TypeScript, Tailwind CSS, Framer
-  Motion (for gamified UI/UX).
+- **Frontend:** Next.js 14+ (App Router), TypeScript, Tailwind CSS, ~~Framer
+  Motion (for gamified UI/UX)~~.
 - **Backend:** FastAPI (Python) for asynchronous performance~~ and LLM
   integration~~.
 - **Database:** SQL Server (SQLModel, pyodbc) for all data (user data, streaks,
@@ -47,8 +47,16 @@
   - **Speaking:** Integration with the Web Speech API (Google Cloud) for
     real-time pronunciation scoring.
 - **Translation:** Bidirectional translation exercises with fuzzy-matching for
-  minor typos.
+
 - **Matching:** Interactive cards for vocabulary/definition pairing.
+
+## 4\. Admin Management
+
+- **Admin Privilege:** Admins can manage users, courses, units, lessons, and
+  exercises with full CRUD operations.
+- Admin panel integration for content management and user reporting.
+
+  minor typos.
 
 ## 4\. Specialized Modules
 
