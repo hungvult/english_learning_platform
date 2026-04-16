@@ -37,6 +37,12 @@ docker compose up -d
 docker compose down -v && docker compose up -d
 ```
 
+### Update backend code
+
+```bash
+docker compose up -d --build backend
+```
+
 ### Re-run seeder only (stack already running)
 
 ```bash
@@ -44,6 +50,27 @@ docker compose run --rm seeder
 ```
 
 The seeder is idempotent — safe to run multiple times.
+
+## Connecting SQL Server
+
+1. Host and port: 127.0.0.1,1433
+
+2. Authentication type: SQL Login
+
+3. User name: sa
+
+4. Password: YourStrong!Passw0rd
+
+5. Database name: EnglishLearning
+
+6. Encrypt:
+
+   Start with Optional
+
+   If it still fails with SSL/cert error, set Encrypt to Mandatory and enable Trust server certificate
+   Connect
+
+7. Connect
 
 ## Manage Containers
 
