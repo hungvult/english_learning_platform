@@ -13,6 +13,7 @@ erDiagram
         NVARCHAR Username
         NVARCHAR Email
         NVARCHAR HashedPassword
+        BOOLEAN IsAdmin
         VARCHAR CEFRLevel "A1-B1"
         INT TotalXP
         INT Hearts
