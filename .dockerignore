@@ -1,0 +1,28 @@
+# Python
+server/venv/
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+
+# Node / Next.js
+client/node_modules/
+client/.next/
+
+# Environment files (injected at runtime)
+**/.env
+**/.env.*
+!**/.env.example
+
+# Git
+**/.git/
+**/.gitignore
+**/.gitmodules
+
+# Docs & IDE
+*.md
+.vscode/
+.idea/
+
+# Duolingo clone reference (not part of the build)
+duolingo-clone/
