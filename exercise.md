@@ -1,22 +1,10 @@
-### **Exercise Specifications**
+<style>
+    img{
+        width: 400px;
+    }
+</style>
 
----
-
-User will engage with a variety of interactive exercises (5 total)
-
-#### **1. Word Bank**
-
-- **Instruction:** The user constructs a sentence by selecting or dragging
-  discrete word tokens from a randomized pool into a target area to match the
-  source prompt.
-- **Skeleton UI:**
-  - **Prompt Container:** Text displaying the sentence to translate (L1 or L2).
-  - **Target Dropzone:** An initially empty, bordered flex-container that
-    receives selected tokens.
-  - **Token Grid:** A flex-wrap layout containing draggable/clickable button
-    elements representing individual words. Includes 2–3 decoy words.
-  - **Action Bar:** "Check" button (disabled until at least one token is
-    placed).
+## Arrange all the words: You are presented with a shuffled sentence in your target language and you have to rearrange the words to form a grammatically correct sentence
 
 Database Schema:
 
@@ -24,9 +12,8 @@ Database Schema:
 
   ```json
   {
-    "instruction": "Điền vào chỗ trống",
-    "text_template": "Mom {0} {1} right now.",
-    "tokens": ["is", "reading", "are", "read"]
+    "instruction": "Arrange all the words",
+    "tokens": ["sentence", "rearrange", "this", "to", "correctly"]
   }
   ```
 
@@ -34,76 +21,147 @@ Database Schema:
 
   ```json
   {
-    "correct_tokens": ["is", "reading"]
+    "correct_sequence": ["rearrange", "this", "sentence", "correctly"]
   }
   ```
 
-Example:
+![alt text](resource/image-4.png)
 
-![alt text](resource/image-3.png)
+## Complete the translation: A sentence is presented and its translation is missing a word and you must type it
 
-#### **2. Listening**
+Database Schema:
 
-- **Instruction:** The user listens to an audio snippet and transcribes the
-  spoken phrase.
-- **Skeleton UI:**
-  - **Prompt Container:** Text reading "Type what you hear."
-  - **Audio Controls:** \* Primary button: Play (normal speed).
-    - Secondary button: Turtle icon (0.5x speed).
-  - **Input Area:** A multiline text input field (or fallback to Word Bank mode
-    for lower difficulty).
-  - **Action Bar:** "Check" button and "Can't listen now" (disables audio
-    exercises for 1 hour).
+- QuestionData:
 
-![alt text](resource/image.png)
+  ```json
+  {
+    "instruction": "Complete the translation",
+    "source_sentence": "I have a cat.",
+    "text_template": "Tôi có một con {0}."
+  }
+  ```
 
-#### **3. Speaking**
+- AnswerData:
 
-- **Instruction:** The user reads the displayed text aloud. The system records
-  the audio via Web Speech API for pronunciation evaluation.
-- **Skeleton UI:**
-  - **Prompt Container:** Text reading "Speak this sentence."
-  - **Target Text:** The sentence to read, displayed in large typography.
-  - **Interaction Area:** A central, prominent microphone button. Supports
-    click-to-record or press-and-hold.
-  - **Feedback State:** An active audio waveform animation or pulsing ring while
-    the microphone is active.
-  - **Action Bar:** "Check" button and "Can't speak now" (disables speaking
-    exercises for 1 hour).
+  ```json
+  {
+    "correct_words": ["mèo"]
+  }
+  ```
 
-#### **4. Bidirectional Translation**
+![alt text](resource/image-5.png)
 
-- **Instruction:** The user reads a sentence in the source language and types
-  the full translation in the target language without the aid of a word bank.
-- **Skeleton UI:**
-  - **Prompt Container:** Text reading "Translate this sentence into [Target
-    Language]."
-  - **Source Text:** The sentence to translate. Includes hover states on words
-    for dictionary hints (if enabled for the user's tier/level).
-  - **Input Area:** An active multiline text area utilizing standard keyboard
-    input.
-  - **Action Bar:** "Check" button (disabled until input length > 0).
+## Picture flashcard matching: You are presented with several words and corresponding images in one language and asked to choose which one matches a word in the other language.
 
-#### **5. Matching**
+Database Schema:
 
-- **Instruction:** The user selects corresponding pairs from a grid of cards.
-  Pairs consist of L1/L2 vocabulary mapping or text/image mapping.
-- **Skeleton UI:**
-  - **Prompt Container:** Text reading "Tap the matching pairs."
-  - **Grid Layout:** A two-column (mobile) or multi-column flex grid containing
-    text cards.
-  - **Interaction States:**
-    - _Default:_ Standard card styling.
-    - _Selected:_ Highlighted border/background.
-    - _Success:_ Green flash, then both cards fade out or are removed from the
-      DOM.
-    - _Error:_ Red flash, horizontal shake animation, then return to default
-      state.
-  - **Action Bar:** "Check" or "Continue" button (automatically triggers when
-    the grid is cleared).
+- QuestionData:
 
-![alt text](resource/image-2.png)
+  ```json
+  {
+    "instruction": "Select the correct image for 'Apple'",
+    "word": "Apple",
+    "options": [
+      {
+        "id": "1",
+        "text": "Quả táo",
+        "image_url": "/images/apple.png"
+      },
+      {
+        "id": "2",
+        "text": "Quả cam",
+        "image_url": "/images/orange.png"
+      }
+    ]
+  }
+  ```
 
-#### ~~Multiple choice~~
+- AnswerData:
 
-![alt text](resource/image-1.png)
+  ```json
+  {
+    "correct_option_id": "1"
+  }
+  ```
+
+![alt text](resource/image-6.png)
+
+## Type what you hear: You are presented with the audio of a sentence and are asked to transcribe it. A button labeled with a turtle repeats the sentence slowly.
+
+Database Schema:
+
+- QuestionData:
+
+  ```json
+  {
+    "instruction": "Type what you hear",
+    "audio_url": "/api/audio/sentence_normal.mp3",
+    "slow_audio_url": "/api/audio/sentence_slow.mp3"
+  }
+  ```
+
+- AnswerData:
+
+  ```json
+  {
+    "correct_transcription": "This is what you heard."
+  }
+  ```
+
+![alt text](resource/image-8.png)
+
+## Listen and choose: You are presented with the audio of a sentence and several written options. You must choose the correct one.
+
+Database Schema:
+
+- QuestionData:
+
+  ```json
+  {
+    "instruction": "Listen and choose",
+    "audio_url": "/api/audio/question.mp3",
+    "options": [
+      {
+        "id": "A",
+        "text": "Option A text"
+      },
+      {
+        "id": "B",
+        "text": "Option B text"
+      }
+    ]
+  }
+  ```
+
+- AnswerData:
+
+  ```json
+  {
+    "correct_option_id": "A"
+  }
+  ```
+
+![alt text](resource/image-7.png)
+
+## Speak this sentence: You are presented with the text of a sentence and asked to speak it into your microphone.
+
+Database Schema:
+
+- QuestionData:
+
+  ```json
+  {
+    "instruction": "Speak this sentence",
+    "sentence": "I am learning to speak."
+  }
+  ```
+
+- AnswerData:
+
+  ```json
+  {
+    "expected_text": "I am learning to speak."
+  }
+  ```
+
+![alt text](resource/image-9.png)
