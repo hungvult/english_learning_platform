@@ -20,9 +20,9 @@ run the backend, seed script, and frontend in separate terminals.
 ```powershell
 git clone https://github.com/hungvult/english_learning_platform.git
 cd English_Learning_Platform
-git clone https://github.com/hungvult/english_learning_platform/client.git
-git clone https://github.com/hungvult/english_learning_platform/server.git
-git clone https://github.com/hungvult/english_learning_platform/seed_data.git
+git clone https://github.com/hungvult/english_learning_platform-client.git
+git clone https://github.com/hungvult/english_learning_platform-server.git
+git clone https://github.com/hungvult/english_learning_platform-seed_data.git
 ```
 
 ### 3. Prepare SQL Server
