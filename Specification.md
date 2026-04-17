@@ -87,10 +87,10 @@ frontend requests the entire lesson payload from the backend.
 - **Payload Structure:** Includes all questions, distractor options, and correct
   answers for deterministic exercises.
 - **Storage:** The frontend caches this payload using a Service Worker and
-  stores it in IndexedDB or local memory.
-- **Audio Assets:** Loaded on-demand only. Audio files are fetched from the
+stores it in IndexedDB or local memory.
+<!-- - **Audio Assets:** Loaded on-demand only. Audio files are fetched from the
   backend when the user explicitly requests them (e.g., pressing a word for
-  searching or hitting the play button), rather than being pre-fetched.
+  searching or hitting the play button), rather than being pre-fetched. -->
 
 ### **2. Client-Side Evaluation (Deterministic Exercises)**
 
@@ -105,18 +105,18 @@ evaluated entirely in the browser.
 
 ### **3. Graceful Degradation (Non-Deterministic Exercises)**
 
-For features relying on your backend LLM or heavy TTS/STT APIs, implement
+For features relying on your ~~backend LLM or~~ heavy TTS/STT APIs, implement
 network-aware fallbacks using `navigator.onLine` and `try/catch` blocks.
 
 - **Speaking Exercises (STT):**
-  - **Logic:** Before initializing the Web Speech API or MediaRecorder, check
-    `navigator.onLine`.
+  - **Logic:** Before initializing the Web Speech API (Google Cloud API) or
+    MediaRecorder, check `navigator.onLine`.
   - **Offline Behavior:** If false, the frontend immediately dispatches a "skip"
     action, bypassing the question without penalizing the user's hearts,
     matching the Duolingo behavior you observed.
 - **Listening Exercises (TTS):**
   - **Logic:** If the audio file wasn't pre-fetched, the frontend attempts to
-    fetch it from the backend API on demand.
+    fetch it from the ~~backend API~~ (Google Cloud API) on demand.
   - **Offline Behavior:** The `fetch()` request will throw a network error. The
     frontend catches this error, disables the play button, and displays a toast
     notification ("Audio unavailable offline"), or provides an option to skip
@@ -136,7 +136,7 @@ completion payload after the user finishes all exercises.
 - **Retry Behavior:** If the final request fails, keep the user on a
   submission-pending screen with a clear Retry button until the submission is
   accepted.
-- **Server Source of Truth:** XP, streak updates, and lesson completion are
+- **Server Source of Truth:** XP, ~~streak updates~~, and lesson completion are
   finalized only after the backend accepts the final payload.
 
 ---

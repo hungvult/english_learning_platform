@@ -1,8 +1,37 @@
 <style>
     img{
-        width: 400px;
+        width: 500px;
     }
 </style>
+
+**Note**
+
+- Audio + Speak: will use Google Cloud API
+
+## Complete the conversation
+
+![alt text](resource/image-10.png)
+
+- QuestionData:
+
+  ```json
+  {
+    "instruction": "Hoàn thành hội thoại",
+    "text": "Water or coffee?",
+    "options": [
+      { "id": "1", "text": "Goodbye!" },
+      { "id": "2", "text": "Coffee, please." }
+    ]
+  }
+  ```
+
+- AnswerData:
+
+  ```json
+  {
+    "correct_option_id": "2"
+  }
+  ```
 
 ## Arrange all the words: You are presented with a shuffled sentence in your target language and you have to rearrange the words to form a grammatically correct sentence
 
@@ -95,8 +124,7 @@ Database Schema:
   ```json
   {
     "instruction": "Type what you hear",
-    "audio_url": "/api/audio/sentence_normal.mp3",
-    "slow_audio_url": "/api/audio/sentence_slow.mp3"
+    "text": "Hello how are you?"
   }
   ```
 
@@ -104,13 +132,13 @@ Database Schema:
 
   ```json
   {
-    "correct_transcription": "This is what you heard."
+    "correct_transcription": "Hello, how are you?"
   }
   ```
 
 ![alt text](resource/image-8.png)
 
-## Listen and choose: You are presented with the audio of a sentence and several written options. You must choose the correct one.
+## Listen and fill: You are presented with audio of a sentence and a bank of word tiles. Select the tiles in sequential order to construct the spoken phrase.
 
 Database Schema:
 
@@ -118,16 +146,27 @@ Database Schema:
 
   ```json
   {
-    "instruction": "Listen and choose",
-    "audio_url": "/api/audio/question.mp3",
-    "options": [
+    "instruction": "Nghe và điền",
+    "word_bank": [
       {
-        "id": "A",
-        "text": "Option A text"
+        "id": "1",
+        "text": "welcome"
       },
       {
-        "id": "B",
-        "text": "Option B text"
+        "id": "2",
+        "text": "sugar"
+      },
+      {
+        "id": "3",
+        "text": "Hello"
+      },
+      {
+        "id": "4",
+        "text": "and"
+      },
+      {
+        "id": "5",
+        "text": "thank you"
       }
     ]
   }
@@ -137,13 +176,13 @@ Database Schema:
 
   ```json
   {
-    "correct_option_id": "A"
+    "correct_sequence_ids": ["3", "1", "4", "5"]
   }
   ```
 
 ![alt text](resource/image-7.png)
 
-## Speak this sentence: You are presented with the text of a sentence and asked to speak it into your microphone.
+## Speak this sentence: You are presented with the text of a sentence and asked to speak it into your microphone
 
 Database Schema:
 
