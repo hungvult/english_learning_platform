@@ -2,6 +2,7 @@
 erDiagram
     USERS ||--o{ USER_LESSON_PROGRESS : tracks
     COURSES ||--o{ UNITS : contains
+    USERS }o--|| COURSES : attends
     UNITS ||--o{ LESSONS : contains
     LESSON_FORMS ||--o{ LESSONS : categorizes
     EXERCISE_TYPES ||--o{ EXERCISES : categorizes
@@ -14,6 +15,7 @@ erDiagram
         NVARCHAR Email
         NVARCHAR HashedPassword
         BOOLEAN IsAdmin
+        UNIQUEIDENTIFIER ActiveCourseId FK
         VARCHAR CEFRLevel "A1-B1"
         INT TotalXP
         INT Hearts
