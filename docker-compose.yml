@@ -65,29 +65,29 @@ services:
     restart: unless-stopped
 
   # ── Next.js client — hot-reload ────────────────────────────────────────────────
-  client:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-      target: development
-    environment:
-      NEXT_TELEMETRY_DISABLED: "1"
-      # Enable polling for Docker bind mounts to prevent infinite reload loops
-      CHOKIDAR_USEPOLLING: "true"
-      WATCHPACK_POLLING: "true"
-      # Browser-side fetch → localhost (host machine port-forwarded by Docker)
-      NEXT_PUBLIC_API_URL: "http://localhost:8000"
-      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-    ports:
-      - "3000:3000"
-    volumes:
-      # Bind-mount source for Next.js HMR; exclude node_modules to use container's copy
-      - ./client:/app
-      - /app/node_modules
-      - /app/.next
-    depends_on:
-      - backend
-    restart: unless-stopped
+  # client:
+  #   build:
+  #     context: ./client
+  #     dockerfile: Dockerfile
+  #     target: development
+  #   environment:
+  #     NEXT_TELEMETRY_DISABLED: "1"
+  #     # Enable polling for Docker bind mounts to prevent infinite reload loops
+  #     CHOKIDAR_USEPOLLING: "true"
+  #     WATCHPACK_POLLING: "true"
+  #     # Browser-side fetch → localhost (host machine port-forwarded by Docker)
+  #     NEXT_PUBLIC_API_URL: "http://localhost:8000"
+  #     NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     # Bind-mount source for Next.js HMR; exclude node_modules to use container's copy
+  #     - ./client:/app
+  #     - /app/node_modules
+  #     - /app/.next
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
 
   # ── One-shot database seeder ───────────────────────────────────────────────────
   seeder:
