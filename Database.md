@@ -8,6 +8,9 @@ erDiagram
     EXERCISE_TYPES ||--o{ EXERCISES : categorizes
     LESSONS ||--o{ EXERCISES : contains
     LESSONS ||--o{ USER_LESSON_PROGRESS : logged_by
+    USERS ||--o{ USER_EXERCISE_LOG : creates
+    LESSONS ||--o{ USER_EXERCISE_LOG : logs
+    EXERCISES ||--o{ USER_EXERCISE_LOG : tracks
 
     USERS {
         UNIQUEIDENTIFIER Id PK
@@ -61,8 +64,16 @@ erDiagram
         UNIQUEIDENTIFIER UserId PK, FK
         UNIQUEIDENTIFIER LessonId PK, FK
         INT Score
-        INT Mistakes
         DATETIME2 CompletedAt
+    }
+    USER_EXERCISE_LOG {
+        UNIQUEIDENTIFIER Id PK
+        UNIQUEIDENTIFIER UserId FK
+        UNIQUEIDENTIFIER LessonId FK
+        UNIQUEIDENTIFIER ExerciseId FK
+        NVARCHAR_MAX UserAnswer
+        BOOLEAN IsCorrect
+        DATETIME2 CreatedAt
     }
 
 ```
