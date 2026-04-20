@@ -1,5 +1,20 @@
 # English Learning Platform
 
+This project is a comprehensive language learning platform featuring a gamified student interface and a robust administrative content management system.
+
+## Project Structure
+
+The project is organized into several key modules, orchestrated to work together seamlessly:
+
+- **[`client/`](./client)**: Frontend application built with **Next.js 14 (App Router)** and **Tailwind CSS**.
+  - **Admin Dashboard**: A powerful CMS built with **React-Admin** for managing courses, units, lessons, and exercises.
+  - **Learning UI**: A custom-designed, interactive interface for students to practice exercises.
+- **[`server/`](./server)**: High-performance backend API built with **FastAPI** and **SQLModel**.
+  - **Database**: Uses **Microsoft SQL Server** for reliable data storage.
+  - **Security**: JWT-based authentication and role-based access control (RBAC).
+- **[`scripts/`](./scripts)**: Standalone tools for database migrations and maintenance.
+- **[`seed_data/`](./seed_data)**: Comprehensive dataset and scripts for initializing the platform with modular content.
+
 ## Installation For Windows Users (I haven't tested on this platform yet)
 
 The repository already includes both `server/` and `seed_data/`, so you only

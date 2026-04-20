@@ -34,6 +34,7 @@ services:
       SA_PASSWORD: "YourStrong!Passw0rd"
       DB_NAME: "EnglishLearning"
       DB_SERVER: "sqlserver"
+      DB_COLLATION: "Latin1_General_100_CI_AI_SC_UTF8"
     volumes:
       - ./scripts/init-db.sh:/init-db.sh:ro
     entrypoint: ["/bin/bash", "/init-db.sh"]
