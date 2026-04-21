@@ -5,7 +5,6 @@ x-backend-env: &backend-env
   ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
 
 services:
-
   # ── SQL Server 2022 ────────────────────────────────────────────────────────────
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -20,7 +19,8 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -Q "SELECT 1" -No -C
+        - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P
+          "YourStrong!Passw0rd" -Q "SELECT 1" -No -C
       interval: 10s
       timeout: 5s
       retries: 12
@@ -46,9 +46,9 @@ services:
   # ── FastAPI backend — hot-reload ───────────────────────────────────────────────
   backend:
     build:
-      context: .                     # project root
+      context: . # project root
       dockerfile: server/Dockerfile
-      target: dev                    # uvicorn --reload stage
+      target: dev # uvicorn --reload stage
     environment:
       <<: *backend-env
     ports:
@@ -58,6 +58,8 @@ services:
       - ./server/app:/app/app
       # Persist uploaded audio across restarts
       - ./server/app/static/audio:/app/app/static/audio
+      # Persist uploaded images across restarts
+      - ./server/app/static/images:/app/app/static/images
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -93,7 +95,7 @@ services:
   # ── One-shot database seeder ───────────────────────────────────────────────────
   seeder:
     build:
-      context: .                     # project root (needs seed_data/ + server/app/)
+      context: . # project root (needs seed_data/ + server/app/)
       dockerfile: server/Dockerfile
       target: seeder
     environment:
