@@ -1,114 +1,167 @@
+# ==============================================================================
+# Docker Compose configuration for English Learning Platform
+# ==============================================================================
+
 # ── Shared backend environment ─────────────────────────────────────────────────
 x-backend-env: &backend-env
-  DATABASE_URL: "mssql+pyodbc://sa:YourStrong!Passw0rd@sqlserver:1433/EnglishLearning?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
-  SECRET_KEY: "your-secret-key-change-in-production"
-  ACCESS_TOKEN_EXPIRE_MINUTES: "1440"
+  DATABASE_URL: "${DATABASE_URL:-mssql+pyodbc://sa:${SA_PASSWORD:-YourStrong!Passw0rd}@sqlserver:1433/${DB_NAME:-EnglishLearning}?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes}"
+  SECRET_KEY: "${SECRET_KEY:-your-secret-key-change-in-production}"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}"
 
 services:
   # ── SQL Server 2022 ────────────────────────────────────────────────────────────
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+      MSSQL_SA_PASSWORD: "${SA_PASSWORD:-YourStrong!Passw0rd}"
       MSSQL_PID: "Developer"
+      MSSQL_MEMORY_LIMIT_MB: "${MSSQL_MEMORY_LIMIT_MB:-2048}"
     ports:
-      - "1433:1433"
+      # Bound to 127.0.0.1 for security: prevent external exposure on host network
+      - "127.0.0.1:1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
     healthcheck:
       test:
         - CMD-SHELL
         - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P
-          "YourStrong!Passw0rd" -Q "SELECT 1" -No -C
+          "$$MSSQL_SA_PASSWORD" -Q "SELECT 1" -No -C
       interval: 10s
       timeout: 5s
       retries: 12
       start_period: 30s
+    networks:
+      - elp-network
     restart: unless-stopped
 
   # ── Database initialiser (one-shot: creates EnglishLearning DB) ───────────────
   init-db:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
     environment:
-      SA_PASSWORD: "YourStrong!Passw0rd"
-      DB_NAME: "EnglishLearning"
-      DB_SERVER: "sqlserver"
-      DB_COLLATION: "Latin1_General_100_CI_AI_SC_UTF8"
+      SA_PASSWORD: "${SA_PASSWORD:-YourStrong!Passw0rd}"
+      DB_NAME: "${DB_NAME:-EnglishLearning}"
+      DB_SERVER: "${DB_SERVER:-sqlserver}"
+      DB_COLLATION: "${DB_COLLATION:-Latin1_General_100_CI_AI_SC_UTF8}"
     volumes:
       - ./scripts/init-db.sh:/init-db.sh:ro
     entrypoint: ["/bin/bash", "/init-db.sh"]
     depends_on:
       sqlserver:
         condition: service_healthy
+    networks:
+      - elp-network
     restart: "no"
 
   # ── FastAPI backend — hot-reload ───────────────────────────────────────────────
   backend:
     build:
-      context: . # project root
-      dockerfile: server/Dockerfile
-      target: dev # uvicorn --reload stage
+      context: ./server
+      dockerfile: Dockerfile
+      target: dev
     environment:
       <<: *backend-env
     ports:
       - "8000:8000"
     volumes:
-      # Hot-reload: every .py save is reflected immediately
+      # Hot-reload: local python edits reflect immediately
       - ./server/app:/app/app
-      # Persist uploaded audio across restarts
-      - ./server/app/static/audio:/app/app/static/audio
-      # Persist uploaded images across restarts
-      - ./server/app/static/images:/app/app/static/images
+      # Persist uploads using named volumes without host permission conflicts
+      - backend_audio:/app/app/static/audio
+      - backend_images:/app/app/static/images
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/').read()"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     depends_on:
       sqlserver:
         condition: service_healthy
       init-db:
         condition: service_completed_successfully
+    networks:
+      - elp-network
     restart: unless-stopped
 
   # ── Next.js client — hot-reload ────────────────────────────────────────────────
-  # client:
-  #   build:
-  #     context: ./client
-  #     dockerfile: Dockerfile
-  #     target: development
-  #   environment:
-  #     NEXT_TELEMETRY_DISABLED: "1"
-  #     # Enable polling for Docker bind mounts to prevent infinite reload loops
-  #     CHOKIDAR_USEPOLLING: "true"
-  #     WATCHPACK_POLLING: "true"
-  #     # Browser-side fetch → localhost (host machine port-forwarded by Docker)
-  #     NEXT_PUBLIC_API_URL: "http://localhost:8000"
-  #     NEXT_PUBLIC_APP_URL: "http://localhost:3000"
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     # Bind-mount source for Next.js HMR; exclude node_modules to use container's copy
-  #     - ./client:/app
-  #     - /app/node_modules
-  #     - /app/.next
-  #   depends_on:
-  #     - backend
-  #   restart: unless-stopped
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      NEXT_TELEMETRY_DISABLED: "${NEXT_TELEMETRY_DISABLED:-1}"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      # Browser fetches go through host-mapped port
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:8000}"
+      NEXT_PUBLIC_APP_URL: "${NEXT_PUBLIC_APP_URL:-http://localhost:3000}"
+      # Container-to-container internal SSR fetch goes directly to backend service
+      INTERNAL_API_URL: "${INTERNAL_API_URL:-http://backend:8000}"
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount client source for HMR; use named volumes to preserve container build dependencies
+      - ./client:/app
+      - client_node_modules:/app/node_modules
+      - client_next:/app/.next
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - elp-network
+    restart: unless-stopped
 
   # ── One-shot database seeder ───────────────────────────────────────────────────
   seeder:
     build:
-      context: . # project root (needs seed_data/ + server/app/)
-      dockerfile: server/Dockerfile
-      target: seeder
+      context: ./server
+      dockerfile: Dockerfile
+      target: dev
     environment:
       <<: *backend-env
       SERVER_PATH: "/app"
     volumes:
-      - ./seed_data:/app/seed_data
+      - ./server/app:/app/app:ro
+      - ./seed_data:/app/seed_data:ro
+      - backend_images:/app/app/static/images
+    entrypoint:
+      - /bin/sh
+      - -c
+      - >
+        mkdir -p /app/app/static/images &&
+        cp -f /app/seed_data/picture/* /app/app/static/images/ 2>/dev/null || true;
+        python /app/seed_data/seed.py && python /app/seed_data/seed_exercises.py
     depends_on:
       sqlserver:
         condition: service_healthy
       init-db:
         condition: service_completed_successfully
+    networks:
+      - elp-network
     restart: "no"
+
+networks:
+  elp-network:
+    name: elp-network
+    driver: bridge
 
 volumes:
   sqlserver_data:
+  backend_audio:
+  backend_images:
+  client_node_modules:
+  client_next:

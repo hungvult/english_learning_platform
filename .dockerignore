@@ -1,28 +1,63 @@
-# Python
-server/venv/
-**/__pycache__/
-**/*.py[cod]
-**/*.pyo
-**/*.pyd
-
-# Node / Next.js
-client/node_modules/
-client/.next/
+# Version Control (match both .git directory and submodule gitlink file)
+**/.git
+**/.git/**
+**/.gitignore
+**/.gitmodules
 
 # Environment files (injected at runtime)
 **/.env
 **/.env.*
 !**/.env.example
 
-# Git
-**/.git/
-**/.gitignore
-**/.gitmodules
+# Security & Credentials
+**/*.pem
+**/*.key
+**/*.pfx
+**/*.cert
+**/*.crt
+**/*id_rsa*
+**/.npmrc
 
-# Docs & IDE
-*.md
+# Python
+server/venv/
+server/.venv/
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/htmlcov/
+**/.coverage
+
+# Uploaded media (keep structure via .gitkeep)
+server/app/static/audio/*
+server/app/static/images/*
+!server/app/static/audio/.gitkeep
+!server/app/static/images/.gitkeep
+
+# Node / Next.js
+client/node_modules/
+client/.next/
+client/out/
+client/.turbo/
+
+# Logs & Caches
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+**/.eslintcache
+**/.prettiercache
+**/coverage/
+**/playwright-report/
+**/test-results/
+
+# OS & IDE
+**/.DS_Store
+**/Thumbs.db
 .vscode/
 .idea/
 
-# Duolingo clone reference (not part of the build)
-duolingo-clone/
+# Docs & Non-build references
+docs/
+*.md

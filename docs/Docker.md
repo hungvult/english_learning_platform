@@ -98,19 +98,31 @@ docker compose down -v && docker compose up --build
 
 ## Dockerfile Architecture
 
-`backend` and `seeder` both build from **`server/Dockerfile`** using different
-multi-stage targets:
+### Backend (`server/Dockerfile`, build context: `./server`)
+
+`server` builds self-contained inside its submodule context:
 
 ```
-server/Dockerfile (build context: project root)
-├── builder  — ODBC build deps + Python wheels
-├── runtime  — lean image: ODBC runtime + packages + server app
-├── dev      ← backend service  (uvicorn --reload)
-└── seeder   ← seeder service   (seed.py one-shot)
+server/Dockerfile (build context: ./server)
+├── builder  — C compilers + unixodbc-dev + Python wheels in /opt/venv
+├── runtime  — lean image: msodbcsql18 + /opt/venv + app (non-root appuser)
+└── dev      ← backend service (uvicorn --reload)
 ```
 
-Shared build cache — both services build together without cross-image
-dependencies.
+`seeder` runs from the `dev` target with `./seed_data` and static assets mounted.
+
+### Frontend (`client/Dockerfile`, build context: `./client`)
+
+`client` supports both development hot-reloading with Turbopack and optimized standalone production deployment:
+
+```
+client/Dockerfile (build context: ./client)
+├── base        — node:20-alpine + libc6-compat
+├── deps        — npm dependencies (npm ci with cache mount)
+├── development ← client service in compose (next dev --turbopack)
+├── builder     — next build with output: 'standalone'
+└── runner      — minimal standalone production container (non-root nextjs)
+```
 
 ## URLs
 
