@@ -7,6 +7,7 @@ x-backend-env: &backend-env
   DATABASE_URL: "${DATABASE_URL:-mssql+pyodbc://sa:${SA_PASSWORD:-YourStrong!Passw0rd}@sqlserver:1433/${DB_NAME:-EnglishLearning}?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes}"
   SECRET_KEY: "${SECRET_KEY:-your-secret-key-change-in-production}"
   ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}"
+  ALLOWED_ORIGINS: "${ALLOWED_ORIGINS:-http://localhost:3000}"
 
 services:
   # ── SQL Server 2022 ────────────────────────────────────────────────────────────
